@@ -11,7 +11,7 @@
 #include "rtc_utils.h"
 
 static void set_app_state(AppState new_state);
-void app_set_date_and_time();
+static void app_set_date_and_time();
 
 static AppState currentAppState = APP_STATE_IDLE;
 
@@ -34,7 +34,7 @@ void ble_control_value_changed(BLEControlCharValue value) {
 	}
 }
 
-void app_set_date_and_time() {
+static void app_set_date_and_time() {
 	set_app_state(APP_STATE_SETTING_DATE_AND_TIME);
 
 	debugPrint("Updating date and time...");

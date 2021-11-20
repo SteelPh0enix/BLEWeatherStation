@@ -92,7 +92,7 @@ static uint8_t const humidityCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0x
 static uint8_t const controlCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0xA5, 0xAB, 0x6B, 0x4D, 0x0D, 0x95, 0xA6,
 		0xFA, 0x45, 0x38, 0x80, 0x80, 0xC2 };
 
-// 5558caa5-ab6b-4d0d-95a6-fa45388080c2 - numberOfRecords characteristic
+// 5558caa6-ab6b-4d0d-95a6-fa45388080c2 - numberOfRecords characteristic
 // 2-byte integer, read/notify. Is always set to number of available records
 // on the device, that can be fetched with GET_DATA command.
 static uint8_t const numberOfRecordsCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0xA6, 0xAB, 0x6B, 0x4D, 0x0D, 0x95, 0xA6,
