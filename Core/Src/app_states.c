@@ -12,8 +12,12 @@
 
 static void set_app_state(AppState new_state);
 static void app_set_date_and_time();
+static void update_alarm_time(RTC_TimeTypeDef* interval);
+
+static const uint8_t alarmSecondsGracePeriod = 3;
 
 static AppState currentAppState = APP_STATE_IDLE;
+static RTC_TimeTypeDef alarmInterval = { 0 };
 
 void ble_control_value_changed(BLEControlCharValue value) {
 	switch (value) {
@@ -23,8 +27,11 @@ void ble_control_value_changed(BLEControlCharValue value) {
 			break;
 		case BLE_CTRL_ABORT_FETCHING:
 			break;
-		case BLE_CTRL_SET_MEASUREMENT_INTERVAL:
+		case BLE_CTRL_SET_MEASUREMENT_INTERVAL: {
+			RTC_TimeTypeDef const newInterval = get_ble_time();
+			app_set_measurement_interval(newInterval.Hours, newInterval.Minutes, newInterval.Seconds);
 			break;
+		}
 		case BLE_CTRL_SET_DATE_AND_TIME:
 			app_set_date_and_time();
 			break;
@@ -32,6 +39,37 @@ void ble_control_value_changed(BLEControlCharValue value) {
 			debugPrint("Control byte changed to unexpected value 0x%02X, not handling that.", (uint8_t )value);
 			break;
 	}
+}
+
+static void update_alarm_time(RTC_TimeTypeDef* interval) {
+	setRTCAlarmSinceNow(interval->Hours, interval->Minutes, interval->Seconds);
+}
+
+void app_rtc_alarm_handler() {
+	update_alarm_time(&alarmInterval);
+}
+
+void app_set_measurement_interval(uint8_t hours, uint8_t minutes, uint8_t seconds) {
+	set_app_state(APP_STATE_SETTING_INTERVAL);
+
+	debugPrint("Updating measurement interval...");
+
+	RTC_TimeTypeDef newAlarmInterval = { 0 };
+
+	newAlarmInterval.Hours = hours;
+	newAlarmInterval.Minutes = minutes;
+	newAlarmInterval.Seconds = seconds;
+
+	if (validateTime(&newAlarmInterval)) {
+		alarmInterval = newAlarmInterval;
+		setRTCAlarmSinceNow(0, 0, alarmSecondsGracePeriod);
+		debugPrint("New alarm interval set, alarm will trigger every %02d:%02d:%02d", hours, minutes, seconds);
+	} else {
+		debugPrint("New interval validation failed, not setting this up. Tried to set alarm every %02d:%02d:%02d",
+				hours, minutes, seconds);
+	}
+
+	set_app_state(APP_STATE_IDLE);
 }
 
 static void app_set_date_and_time() {

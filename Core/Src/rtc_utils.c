@@ -7,7 +7,6 @@
 
 #include "rtc_utils.h"
 #include "print_utils.h"
-#include <stdbool.h>
 
 bool validateTime(RTC_TimeTypeDef* time) {
 	bool const hours_valid = time->Hours < 24;
@@ -20,24 +19,20 @@ bool validateTime(RTC_TimeTypeDef* time) {
 bool validateDate(RTC_DateTypeDef* date) {
 	bool const date_valid = date->Date <= 31 && date->Date != 0;
 	bool const month_valid = date->Month <= 12 && date->Month != 0;
-	bool const weekday_valid = date->WeekDay <= RTC_WEEKDAY_SUNDAY && date->WeekDay != 0;
+	bool const weekday_valid = date->WeekDay <= RTC_WEEKDAY_SUNDAY && date->WeekDay >= RTC_WEEKDAY_MONDAY;
 
 	return date_valid && month_valid && weekday_valid;
 }
 
 bool validateAlarm(RTC_AlarmTypeDef* alarm) {
-	bool const weekday_valid = alarm->AlarmDateWeekDay <= RTC_WEEKDAY_SUNDAY && alarm->AlarmDateWeekDay != 0;
+	bool const weekday_valid = alarm->AlarmDateWeekDay <= RTC_WEEKDAY_SUNDAY
+			&& alarm->AlarmDateWeekDay >= RTC_WEEKDAY_MONDAY;
 	bool const time_valid = validateTime(&(alarm->AlarmTime));
 
 	return weekday_valid && time_valid;
 }
 
 void setRTCAlarm(uint8_t hour, uint8_t minute, uint8_t second) {
-	if (!NVIC_GetEnableIRQ(RTC_Alarm_IRQn)) {
-		HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 5, 0);
-		HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-	}
-
 	RTC_AlarmTypeDef alarm = { 0 };
 	alarm.AlarmTime.Hours = hour;
 	alarm.AlarmTime.Minutes = minute;
@@ -48,6 +43,19 @@ void setRTCAlarm(uint8_t hour, uint8_t minute, uint8_t second) {
 	alarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_WEEKDAY;
 	alarm.AlarmDateWeekDay = 1;
 	alarm.Alarm = RTC_ALARM_A;
+
+	setRTCAlarmS(alarm);
+}
+
+void setRTCAlarmSinceNow(uint8_t hour, uint8_t minute, uint8_t second) {
+	RTC_TimeTypeDef currentTime = { 0 };
+	RTC_DateTypeDef currentDate = { 0 };
+	RTC_AlarmTypeDef alarm = { 0 };
+	HAL_RTC_GetTime(&hrtc, &currentTime, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &currentDate, RTC_FORMAT_BIN);
+	HAL_RTC_GetAlarm(&hrtc, &alarm, RTC_ALARM_A, RTC_FORMAT_BIN);
+
+	alarm.AlarmTime = timestampAfter(currentTime, hour, minute, second);
 
 	setRTCAlarmS(alarm);
 }
@@ -75,6 +83,11 @@ void setRTCDate(uint8_t year, uint8_t month, uint8_t day, uint8_t weekday) {
 }
 
 void setRTCAlarmS(RTC_AlarmTypeDef alarm) {
+	if (!NVIC_GetEnableIRQ(RTC_Alarm_IRQn)) {
+		HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 5, 0);
+		HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+	}
+
 	if (validateAlarm(&alarm)) {
 		HAL_StatusTypeDef status = HAL_RTC_SetAlarm_IT(&hrtc, &alarm, RTC_FORMAT_BIN);
 		if (status == HAL_OK) {
@@ -122,12 +135,6 @@ RTC_TimeTypeDef moveRTCAlarm(uint8_t hours, uint8_t minutes, uint8_t seconds) {
 	HAL_RTC_GetAlarm(&hrtc, &alarm, RTC_ALARM_A, RTC_FORMAT_BIN);
 
 	RTC_TimeTypeDef newAlarmTime = timestampAfter(alarm.AlarmTime, hours, minutes, seconds);
-	if (alarm.AlarmTime.Hours > newAlarmTime.Hours) {
-		alarm.AlarmDateWeekDay++;
-		if (alarm.AlarmDateWeekDay > RTC_WEEKDAY_SUNDAY) {
-			alarm.AlarmDateWeekDay = RTC_WEEKDAY_MONDAY;
-		}
-	}
 
 	alarm.AlarmTime = newAlarmTime;
 	HAL_StatusTypeDef status = HAL_RTC_SetAlarm_IT(&hrtc, &alarm, RTC_FORMAT_BIN);
@@ -145,13 +152,6 @@ RTC_TimeTypeDef moveRTCAlarmBySeconds(unsigned secondsSinceLastOne) {
 	HAL_RTC_GetAlarm(&hrtc, &alarm, RTC_ALARM_A, RTC_FORMAT_BIN);
 
 	RTC_TimeTypeDef newAlarmTime = timestampAfterSeconds(alarm.AlarmTime, secondsSinceLastOne);
-// Check if we passed midnight - if that's the case, then we have to set the alarm on next day
-	if (alarm.AlarmTime.Hours > newAlarmTime.Hours) {
-		alarm.AlarmDateWeekDay++;
-		if (alarm.AlarmDateWeekDay > RTC_WEEKDAY_SUNDAY) {
-			alarm.AlarmDateWeekDay = RTC_WEEKDAY_MONDAY;
-		}
-	}
 
 	alarm.AlarmTime = newAlarmTime;
 	HAL_StatusTypeDef status = HAL_RTC_SetAlarm_IT(&hrtc, &alarm, RTC_FORMAT_BIN);

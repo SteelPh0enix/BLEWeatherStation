@@ -9,9 +9,15 @@
 #define INC_RTC_UTILS_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "rtc.h"
 
+bool validateTime(RTC_TimeTypeDef* time);
+bool validateDate(RTC_DateTypeDef* date);
+bool validateAlarm(RTC_AlarmTypeDef* alarm);
+
 void setRTCAlarm(uint8_t hour, uint8_t minute, uint8_t second);
+void setRTCAlarmSinceNow(uint8_t hour, uint8_t minute, uint8_t second);
 void setRTCTime(uint8_t hour, uint8_t minute, uint8_t second);
 void setRTCDate(uint8_t year, uint8_t month, uint8_t day, uint8_t weekday);
 

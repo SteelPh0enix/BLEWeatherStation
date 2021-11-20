@@ -22,5 +22,6 @@ typedef enum AppState_t {
 AppState get_app_state();
 
 void app_set_measurement_interval(uint8_t hours, uint8_t minutes, uint8_t seconds);
+void app_rtc_alarm_handler();
 
 #endif /* INC_APP_STATES_H_ */
