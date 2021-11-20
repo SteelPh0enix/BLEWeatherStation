@@ -32,7 +32,7 @@ bool validateAlarm(RTC_AlarmTypeDef* alarm) {
 	return weekday_valid && time_valid;
 }
 
-void setRTCAlarm(uint8_t week_day, uint8_t hour, uint8_t minute, uint8_t second) {
+void setRTCAlarm(uint8_t hour, uint8_t minute, uint8_t second) {
 	if (!NVIC_GetEnableIRQ(RTC_Alarm_IRQn)) {
 		HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 5, 0);
 		HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
@@ -43,10 +43,10 @@ void setRTCAlarm(uint8_t week_day, uint8_t hour, uint8_t minute, uint8_t second)
 	alarm.AlarmTime.Minutes = minute;
 	alarm.AlarmTime.Seconds = second;
 	alarm.AlarmTime.SubSeconds = 0;
-	alarm.AlarmMask = RTC_ALARMMASK_NONE;
+	alarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY;
 	alarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
 	alarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_WEEKDAY;
-	alarm.AlarmDateWeekDay = week_day;
+	alarm.AlarmDateWeekDay = 1;
 	alarm.Alarm = RTC_ALARM_A;
 
 	setRTCAlarmS(alarm);

@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "rtc.h"
 
-void setRTCAlarm(uint8_t week_day, uint8_t hour, uint8_t minute, uint8_t second);
+void setRTCAlarm(uint8_t hour, uint8_t minute, uint8_t second);
 void setRTCTime(uint8_t hour, uint8_t minute, uint8_t second);
 void setRTCDate(uint8_t year, uint8_t month, uint8_t day, uint8_t weekday);
 

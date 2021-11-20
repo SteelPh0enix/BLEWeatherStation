@@ -95,7 +95,7 @@ void MX_RTC_Init(void)
   sAlarm.AlarmTime.Minutes = 0;
   sAlarm.AlarmTime.Seconds = 0;
   sAlarm.AlarmTime.SubSeconds = 0;
-  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+  sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY;
   sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
   sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
   sAlarm.AlarmDateWeekDay = 1;
