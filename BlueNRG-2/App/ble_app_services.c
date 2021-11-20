@@ -20,13 +20,13 @@ static uint8_t const weatherServiceUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 
 		0xA6, 0xFA, 0x45, 0x38, 0x80, 0x80, 0xC2 };
 
 // 5558caa0-ab6b-4d0d-95a6-fa45388080c2 - time characteristic
-// Contains 3 bytes, in order: hour, minute, second.
+// Contains 3 bytes, in order from MSB: hour, minute, second.
 // Read/write.
 static uint8_t const timeCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0xA0, 0xAB, 0x6B, 0x4D, 0x0D, 0x95, 0xA6,
 		0xFA, 0x45, 0x38, 0x80, 0x80, 0xC2 };
 
 // 5558caa1-ab6b-4d0d-95a6-fa45388080c2 - date characteristic
-// Contains 4 bytes: year (last two digits), month, day and weekday (1-7)
+// Contains 4 bytes, in order from MSB: year (last two digits), month, day and weekday (1-7)
 // Read/write.
 static uint8_t const dateCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0xA1, 0xAB, 0x6B, 0x4D, 0x0D, 0x95, 0xA6,
 		0xFA, 0x45, 0x38, 0x80, 0x80, 0xC2 };

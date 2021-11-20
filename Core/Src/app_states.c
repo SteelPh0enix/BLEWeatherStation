@@ -29,7 +29,7 @@ void ble_control_value_changed(BLEControlCharValue value) {
 			app_set_date_and_time();
 			break;
 		default:
-			debugPrint("Control byte changed to unexpected value 0x%02x, not handling that.", (uint8_t )value);
+			debugPrint("Control byte changed to unexpected value 0x%02X, not handling that.", (uint8_t )value);
 			break;
 	}
 }
@@ -49,14 +49,9 @@ void app_set_date_and_time() {
 }
 
 static void set_app_state(AppState new_state) {
+	debugPrint("App state change from 0x%02X to 0x%02X", currentAppState, new_state);
 	currentAppState = new_state;
 
-// Values set by connected device:
-//	* GET_DATA
-//	* FETCH_NEXT_RECORD
-//	* ABORT_FETCHING
-//	* SET_MEASUREMENT_INTERVAL
-//	* SET_DATE_AND_TIME
 // Value set by weather station:
 //	* DEFAULT
 //	* NEXT_RECORD_AVAILABLE
@@ -70,6 +65,7 @@ static void set_app_state(AppState new_state) {
 		default:
 			break;
 	}
+
 }
 
 AppState get_app_state() {
