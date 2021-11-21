@@ -18,19 +18,46 @@ STTS751_Object_t stts;
 
 float mems_get_temperature() {
 	float ret = 0.f;
-	STTS751_TEMP_GetTemperature(&stts, &ret);
+	uint8_t ready = 0;
+	STTS751_Set_One_Shot(&stts);
+
+	while (ready == 0) {
+		STTS751_TEMP_Get_DRDY_Status(&stts, &ready);
+	}
+
+	if (STTS751_TEMP_GetTemperature(&stts, &ret) != STTS751_OK) {
+		debugPrint("Couldn't read temperature correctly!");
+	}
 	return ret;
 }
 
 float mems_get_pressure() {
 	float ret = 0.f;
-	LPS22HB_PRESS_GetPressure(&lps, &ret);
+	uint8_t ready = 0;
+	LPS22HB_Set_One_Shot(&lps);
+
+	while (ready == 0) {
+		LPS22HB_PRESS_Get_DRDY_Status(&lps, &ready);
+	}
+
+	if (LPS22HB_PRESS_GetPressure(&lps, &ret) != LPS22HB_OK) {
+		debugPrint("Couldn't read pressure correctly!");
+	}
 	return ret;
 }
 
 float mems_get_humidity() {
 	float ret = 0.f;
-	HTS221_HUM_GetHumidity(&hts, &ret);
+	uint8_t ready = 0;
+	HTS221_Set_One_Shot(&hts);
+
+	while (ready == 0) {
+		HTS221_HUM_Get_DRDY_Status(&hts, &ready);
+	}
+
+	if (HTS221_HUM_GetHumidity(&hts, &ret) != HTS221_OK) {
+		debugPrint("Couldn't read humidity correctly!");
+	}
 	return ret;
 }
 
@@ -81,35 +108,14 @@ int32_t mems_config() {
 }
 
 void mems_init() {
-	HTS221_IO_t hts_io = {
-			.Init = BSP_I2C1_Init,
-			.DeInit = BSP_I2C1_DeInit,
-			.BusType = 0,
-			.Address = 0xBE,
-			.WriteReg = BSP_I2C1_WriteReg,
-			.ReadReg = BSP_I2C1_ReadReg,
-			.GetTick = get_tick_wrap
-	};
+	HTS221_IO_t hts_io = { .Init = BSP_I2C1_Init, .DeInit = BSP_I2C1_DeInit, .BusType = 0, .Address = 0xBE, .WriteReg =
+			BSP_I2C1_WriteReg, .ReadReg = BSP_I2C1_ReadReg, .GetTick = get_tick_wrap };
 
-	LPS22HB_IO_t lps_io = {
-			.Init = BSP_I2C1_Init,
-			.DeInit = BSP_I2C1_DeInit,
-			.BusType = 0,
-			.Address = 0xBA,
-			.WriteReg = BSP_I2C1_WriteReg,
-			.ReadReg = BSP_I2C1_ReadReg,
-			.GetTick = get_tick_wrap
-	};
+	LPS22HB_IO_t lps_io = { .Init = BSP_I2C1_Init, .DeInit = BSP_I2C1_DeInit, .BusType = 0, .Address = 0xBA, .WriteReg =
+			BSP_I2C1_WriteReg, .ReadReg = BSP_I2C1_ReadReg, .GetTick = get_tick_wrap };
 
-	STTS751_IO_t stts_io = {
-			.Init = BSP_I2C1_Init,
-			.DeInit = BSP_I2C1_DeInit,
-			.BusType = 0,
-			.Address = 0x94,
-			.WriteReg = BSP_I2C1_WriteReg,
-			.ReadReg = BSP_I2C1_ReadReg,
-			.GetTick = get_tick_wrap
-	};
+	STTS751_IO_t stts_io = { .Init = BSP_I2C1_Init, .DeInit = BSP_I2C1_DeInit, .BusType = 0, .Address = 0x94,
+			.WriteReg = BSP_I2C1_WriteReg, .ReadReg = BSP_I2C1_ReadReg, .GetTick = get_tick_wrap };
 
 	int32_t retval = HTS221_RegisterBusIO(&hts, &hts_io);
 	if (retval != HTS221_OK) {

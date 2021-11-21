@@ -146,8 +146,8 @@ void StartDefaultTask(void* argument) {
 			HAL_RTC_GetDate(&hrtc, &currentDate, RTC_FORMAT_BIN);
 			debugPrint("RTC alarm just happened @ %02d:%02d:%02d!", currentTime.Hours, currentTime.Minutes,
 					currentTime.Seconds);
-			isTimeForUpdate = false;
 			app_rtc_alarm_handler();
+			isTimeForUpdate = false;
 		}
 	}
 	/* USER CODE END StartDefaultTask */

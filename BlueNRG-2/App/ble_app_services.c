@@ -32,7 +32,7 @@ static uint8_t const dateCharUUIDBytes[UUID_LENGTH] = { 0x55, 0x58, 0xCA, 0xA1, 
 		0xFA, 0x45, 0x38, 0x80, 0x80, 0xC2 };
 
 // 5558caa2-ab6b-4d0d-95a6-fa45388080c2 - temperature characteristic
-// Contains 2-byte temperature value, stored as fixed-point integer
+// Contains 4-byte temperature value, stored as fixed-point integer
 // with 2 digits of precision, multiplied by 100.
 // After reading, divide it by 100 to get the correct value.
 // For example, if you read 2034 - that means the temperature is 20.34*C
@@ -202,7 +202,7 @@ void add_app_services() {
 			 weatherServiceHandle, // service handle
 			 UUID_TYPE_128, // UUID type
 			 &temperatureCharUUID, // UUID
-			 2, // value length (bytes)
+			 4, // value length (bytes)
 			 CHAR_PROP_READ, // properties
 			 ATTR_PERMISSION_NONE, // permissions
 			 GATT_DONT_NOTIFY_EVENTS, // event mask
@@ -223,7 +223,7 @@ void add_app_services() {
 			 weatherServiceHandle, // service handle
 			 UUID_TYPE_128, // UUID type
 			 &pressureCharUUID, // UUID
-			 2, // value length (bytes)
+			 4, // value length (bytes)
 			 CHAR_PROP_READ, // properties
 			 ATTR_PERMISSION_NONE, // permissions
 			 GATT_DONT_NOTIFY_EVENTS, // event mask
@@ -244,7 +244,7 @@ void add_app_services() {
 			 weatherServiceHandle, // service handle
 			 UUID_TYPE_128, // UUID type
 			 &humidityCharUUID, // UUID
-			 2, // value length (bytes)
+			 4, // value length (bytes)
 			 CHAR_PROP_READ, // properties
 			 ATTR_PERMISSION_NONE, // permissions
 			 GATT_DONT_NOTIFY_EVENTS, // event mask

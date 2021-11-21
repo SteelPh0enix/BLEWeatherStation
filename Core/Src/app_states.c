@@ -9,12 +9,14 @@
 #include "ble_app_interface.h"
 #include "print_utils.h"
 #include "rtc_utils.h"
+#include "mems_data_buffer.h"
+#include "mems_sensors.h"
 
 static void set_app_state(AppState new_state);
 static void app_set_date_and_time();
 static void update_alarm_time(RTC_TimeTypeDef* interval);
 
-static const uint8_t alarmSecondsGracePeriod = 3;
+static uint8_t const alarmSecondsGracePeriod = 3;
 
 static AppState currentAppState = APP_STATE_IDLE;
 static RTC_TimeTypeDef alarmInterval = { 0 };
@@ -45,8 +47,51 @@ static void update_alarm_time(RTC_TimeTypeDef* interval) {
 	setRTCAlarmSinceNow(interval->Hours, interval->Minutes, interval->Seconds);
 }
 
+static void print_measurement(WeatherStationMeasurement const* measurement) {
+	// @formatter:off
+	printf("\tMeasurement @ %02d:%02d:%02d, %02d-%02d-20%02d -> temperature: %.2f*C, pressure: %.2fhPa, humidity: %.2f%% \n",
+			measurement->hour, measurement->minute, measurement->second,
+			measurement->day, measurement->month, measurement->day,
+			((float)(measurement->temperature)) / 100.f,
+			((float)(measurement->pressure)) / 100.f,
+			((float)(measurement->humidity)) / 100.f);
+		// @formatter:on
+}
+
+static void make_new_measurement() {
+	WeatherStationMeasurement measurement = { 0 };
+	RTC_TimeTypeDef currentTime = { 0 };
+	RTC_DateTypeDef currentDate = { 0 };
+
+	HAL_RTC_GetTime(&hrtc, &currentTime, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &currentDate, RTC_FORMAT_BIN);
+
+	measurement.temperature = (int32_t) (mems_get_temperature() * 100.f);
+	measurement.pressure = (int32_t) (mems_get_pressure() * 100.f);
+	measurement.humidity = (int32_t) (mems_get_humidity() * 100.f);
+
+	measurement.hour = currentTime.Hours;
+	measurement.minute = currentTime.Minutes;
+	measurement.second = currentTime.Seconds;
+
+	measurement.year = currentDate.Year;
+	measurement.month = currentDate.Month;
+	measurement.day = currentDate.Date;
+
+	print_measurement(&measurement);
+
+	if (append_measurement(&measurement)) {
+		debugPrint("Measurement added to buffer, %u measurements in buffer, %u slots left",
+				measurements_stored_count(), measurements_slots_left());
+	} else {
+		debugPrint("Measurement NOT ADDED to buffer, %u measurements in buffer, %u slots left",
+				measurements_stored_count(), measurements_slots_left());
+	}
+}
+
 void app_rtc_alarm_handler() {
 	update_alarm_time(&alarmInterval);
+	make_new_measurement();
 }
 
 void app_set_measurement_interval(uint8_t hours, uint8_t minutes, uint8_t seconds) {
@@ -82,6 +127,8 @@ static void app_set_date_and_time() {
 
 	setRTCDateS(date);
 	setRTCTimeS(time);
+
+	setRTCAlarmSinceNow(0, 0, alarmSecondsGracePeriod);
 
 	set_app_state(APP_STATE_IDLE);
 }
