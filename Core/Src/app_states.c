@@ -67,7 +67,7 @@ static void print_measurement(WeatherStationMeasurement const *measurement) {
 			((float)(measurement->temperature)) / 100.f,
 			((float)(measurement->pressure)) / 100.f,
 			((float)(measurement->humidity)) / 100.f);
-					// @formatter:on
+						// @formatter:on
 }
 
 static void make_new_measurement() {
@@ -111,12 +111,7 @@ static void make_new_measurement() {
 
 void app_rtc_alarm_handler() {
 	update_alarm_time(&alarmInterval);
-	if (!isFetchingData) {
-		make_new_measurement();
-	} else {
-		debugPrint(
-				"Data fetching in progress, measurements stopped until it's finished!");
-	}
+	make_new_measurement();
 }
 
 void app_set_measurement_interval(uint8_t hours, uint8_t minutes,
@@ -204,7 +199,10 @@ static void set_app_state(AppState new_state) {
 	switch (new_state) {
 	case APP_STATE_IDLE:
 		if (isFetchingData) {
-			set_app_state(APP_STATE_RECORD_READY);
+			// do not change the value of control char when it's set to NEXT_RECORD_AVAILABLE
+			// to prevent sync issues on the device side
+			return;
+//			set_app_state(APP_STATE_RECORD_READY);
 		} else {
 			set_ble_control_value(BLE_CTRL_DEFAULT);
 		}
