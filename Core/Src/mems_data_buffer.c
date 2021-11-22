@@ -7,7 +7,7 @@
 
 #include "mems_data_buffer.h"
 
-#define MAX_MEASUREMENTS_STORED 512
+#define MAX_MEASUREMENTS_STORED 2048
 
 static WeatherStationMeasurement measurementsData[MAX_MEASUREMENTS_STORED] = { 0 };
 static WeatherStationMeasurement const* const endOfMeasurementDataBuffer = &measurementsData[MAX_MEASUREMENTS_STORED];
@@ -16,7 +16,7 @@ static WeatherStationMeasurement* firstMeasurement = &measurementsData[0];
 static size_t currentlyStoredMeasurements = 0;
 
 WeatherStationMeasurement* get_next_element(WeatherStationMeasurement* current_element) {
-	WeatherStationMeasurement* nextElement = current_element + 1;
+	WeatherStationMeasurement* nextElement = current_element + (measurements_stored_count() > 0);
 	if (nextElement == endOfMeasurementDataBuffer) {
 		nextElement = &measurementsData[0];
 	}

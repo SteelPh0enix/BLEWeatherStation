@@ -28,6 +28,11 @@ uint16_t get_ble_number_of_records();
 
 void set_ble_control_value(BLEControlCharValue value);
 void set_ble_number_of_records(uint16_t number);
+void set_ble_time(uint8_t hour, uint8_t minute, uint8_t second);
+void set_ble_date(uint8_t year, uint8_t month, uint8_t day, uint8_t weekday);
+void set_ble_temperature(int32_t temperature);
+void set_ble_pressure(int32_t pressure);
+void set_ble_humidity(int32_t humidity);
 
 void ble_control_value_changed(BLEControlCharValue value);
 

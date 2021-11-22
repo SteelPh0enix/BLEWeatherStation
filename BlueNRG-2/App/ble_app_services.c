@@ -385,7 +385,7 @@ uint8_t set_characteristic_value(BLECharacteristic characteristic, uint8_t data[
 	}
 
 	uint16_t const charHandle = *(charIDBindTable[(size_t) characteristic]);
-	// BLE byte order is reversed
-	invert_byte_order(data, length);
+	// BLE byte order is reversed - sike
+//	invert_byte_order(data, length);
 	return aci_gatt_update_char_value(weatherServiceHandle, charHandle, 0, length, data);
 }

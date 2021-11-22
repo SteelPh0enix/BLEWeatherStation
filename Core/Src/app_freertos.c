@@ -128,7 +128,7 @@ void StartDefaultTask(void* argument) {
 	debugPrint("Hello, world!");
 	mems_init();
 	ble_init();
-	app_set_measurement_interval(1, 0, 0);
+	app_set_measurement_interval(0, 0, 10);
 
 	RTC_TimeTypeDef currentTime = { 0 };
 	RTC_DateTypeDef currentDate = { 0 };
