@@ -72,7 +72,7 @@ void set_ble_control_value(BLEControlCharValue value) {
 void set_ble_number_of_records(uint16_t number) {
 	debugPrint("Number of records set to %d", number);
 	uint8_t val[2] = { 0 };
-	VALUE_TO_16BIT_BYTEARRAY_BE(number, val);
+	VALUE_TO_16BIT_BYTEARRAY_LE(number, val);
 	set_characteristic_value(BLE_CHAR_NUMBER_OF_RECORDS, val, 2);
 }
 
@@ -91,21 +91,21 @@ void set_ble_date(uint8_t year, uint8_t month, uint8_t day, uint8_t weekday) {
 void set_ble_temperature(int32_t temperature) {
 	debugPrint("Temperature set to %ld", temperature);
 	uint8_t val[4] = {0};
-	VALUE_TO_32BIT_BYTEARRAY_BE(temperature, val);
+	VALUE_TO_32BIT_BYTEARRAY_LE(temperature, val);
 	set_characteristic_value(BLE_CHAR_TEMPERATURE, val, 4);
 }
 
 void set_ble_pressure(int32_t pressure) {
 	debugPrint("Pressure set to %ld", pressure);
 	uint8_t val[4] = {0};
-	VALUE_TO_32BIT_BYTEARRAY_BE(pressure, val);
+	VALUE_TO_32BIT_BYTEARRAY_LE(pressure, val);
 	set_characteristic_value(BLE_CHAR_PRESSURE, val, 4);
 }
 
 void set_ble_humidity(int32_t humidity) {
 	debugPrint("Humidity set to %ld", humidity);
 	uint8_t val[4] = {0};
-	VALUE_TO_32BIT_BYTEARRAY_BE(humidity, val);
+	VALUE_TO_32BIT_BYTEARRAY_LE(humidity, val);
 	set_characteristic_value(BLE_CHAR_HUMIDITY, val, 4);
 }
 

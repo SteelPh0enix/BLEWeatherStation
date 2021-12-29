@@ -63,7 +63,7 @@ static void print_measurement(WeatherStationMeasurement const *measurement) {
 	// @formatter:off
 	printf("\tMeasurement @ %02d:%02d:%02d, %02d-%02d-20%02d -> temperature: %.2f*C, pressure: %.2fhPa, humidity: %.2f%% \n",
 			measurement->hour, measurement->minute, measurement->second,
-			measurement->day, measurement->month, measurement->day,
+			measurement->day, measurement->month, measurement->year,
 			((float)(measurement->temperature)) / 100.f,
 			((float)(measurement->pressure)) / 100.f,
 			((float)(measurement->humidity)) / 100.f);
